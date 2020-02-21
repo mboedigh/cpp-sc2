@@ -209,14 +209,16 @@ bool Convert(const ObservationRawPtr& observation_raw, UnitPool& unit_pool, uint
         unit->is_on_screen = observation_unit.is_on_screen();
         unit->is_blip = observation_unit.is_blip();
 
-        auto health = observation_unit.health();
-        float damage = unit->health - health;
-        auto shield = observation_unit.shield();
-        damage += (unit->shield - shield);
-        if (damage > 0)
-            unit_pool.AddUnitDamaged(unit, damage);
-        unit->shield = shield;
-        unit->health = health;
+        auto cur_health = observation_unit.health();
+        float damage = unit->health - cur_health;
+        unit->health = cur_health;
+
+        auto cur_shield = observation_unit.shield();
+        float shield_damage = unit->shield - cur_shield;
+        unit->shield = cur_shield;
+
+        if (damage > 0 || shield_damage > 0)
+            unit_pool.AddUnitDamaged(unit);
 
         unit->health_max = observation_unit.health_max();
         unit->shield_max = observation_unit.shield_max();
