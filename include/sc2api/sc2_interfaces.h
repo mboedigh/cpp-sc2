@@ -222,7 +222,8 @@ public:
     //! Returns terrain height of the given point.
     //!< \param point Position to sample.
     //!< \return Height.
-    virtual float TerrainHeight(const Point2D& point) const = 0;
+    virtual float TerrainHeight(const Point2D& point) const = 0; // convenience
+    virtual float TerrainHeight(int x, int y) const = 0; // efficient
 
     //! A pointer to the low-level protocol data for the current observation. While it's possible to extract most in-game data from this pointer
     // it is highly discouraged. It should only be used for extracting feature layers because it would be inefficient to copy these each frame.

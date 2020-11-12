@@ -38,14 +38,14 @@ MapState::MapState(const SC2APIProtocol::MapState& map):
 bool MapState::HasCreep(const sc2::Point2D& point) const {
     if (creep_data_.BPP() == 1) {
         bool value;
-        if (!creep_data_.GetBit(point, &value))
+        if (!creep_data_.GetBit((int)point.x, (int)point.y, &value))
             return false;
 
         return value;
     }
 
     unsigned char value;
-    if (!creep_data_.GetBit(point, &value))
+    if (!creep_data_.GetBit((int)point.x, (int)point.y, &value))
         return false;
 
     return value > 0;
@@ -163,6 +163,7 @@ public:
     bool IsPathable(const Point2D& point) const final;
     bool IsPlacable(const Point2D& point) const final;
     float TerrainHeight(const Point2D& point) const final;
+    float TerrainHeight(int x, int y) const final;
 
     uint32_t GetMinerals() const final { return minerals_; }
     uint32_t GetVespene() const final { return vespene_;  }
@@ -513,6 +514,9 @@ bool ObservationImp::IsPlacable(const Point2D& point) const {
 
 float ObservationImp::TerrainHeight(const Point2D& point) const {
     return HeightMap(GetGameInfo()).TerrainHeight(point);
+}
+float ObservationImp::TerrainHeight(int x, int y) const {
+    return HeightMap(GetGameInfo()).TerrainHeight(x, y);
 }
 
 bool ObservationImp::UpdateObservation() {
@@ -2115,6 +2119,8 @@ void ControlImp::IssueAlertEvents() {
 }
 
 void ControlImp::IssueUpgradeEvents() {
+    // todo: change upgrades_ to a set, and knock this non-sense off. see sc2_client::626 for pushing onto upgrades. instead, insert into set and
+    // store new upgrades in separate vector
     std::set<uint32_t> previous;
     for (auto up : observation_imp_->upgrades_previous_) {
         previous.insert(up);
@@ -2127,6 +2133,8 @@ void ControlImp::IssueUpgradeEvents() {
     }
 }
 
+// todo: inject Agent * into calls to client so that the interface can be implemented outside of the agent
+// todo: change IssueEvents interface to a pull instead of push (maybe not)
 bool ControlImp::IssueEvents(const std::vector<Tag>& commands) {
     if (observation_imp_->current_game_loop_ == observation_imp_->previous_game_loop) {
         return false;

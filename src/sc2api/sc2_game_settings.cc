@@ -37,8 +37,8 @@ ReplaySettings::ReplaySettings() :
     player_id(1) {
 }
 
-const char* kMapBelShirVestigeLE = "Ladder/(2)Bel'ShirVestigeLE (Void).SC2Map";
-const char* kMapEmpty            = "Test/Empty.SC2Map";
+const char* kMapBelShirVestigeLE = "Ladder2017Season1/BelShirVestigeLE.SC2Map";
+const char* kMapEmpty            = "Melee/Empty128.SC2Map";
 const char* kMapEmptyLong        = "Test/EmptyLong.SC2Map";
 const char* kMapEmptyTall        = "Test/EmptyTall.SC2Map";
 const char* kMapMarineMicro      = "Example/MarineMicro.SC2Map";

@@ -114,8 +114,10 @@ struct SampleImage {
     explicit SampleImage(const ImageData& data);
 
     bool GetBit(const Point2DI& point, bool* dst) const;
+    bool GetBit(int x, int y, bool* dst) const;
 
     bool GetBit(const Point2DI& point, unsigned char* dst) const;
+    bool GetBit(int x, int y, unsigned char* dst) const;
 
     int BPP() const;
 
@@ -156,6 +158,7 @@ struct HeightMap {
     explicit HeightMap(const GameInfo& info);
 
     float TerrainHeight(const Point2DI& point) const;
+    float TerrainHeight(int x, int y) const;
 
     void Dump(const std::string& file_path) const;
 

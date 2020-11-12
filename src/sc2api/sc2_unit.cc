@@ -25,7 +25,7 @@ Unit* UnitPool::CreateUnit(Tag tag) {
     Unit* unit = &pool[available_index_.second];
     unit->last_seen_game_loop = 0; // initialization required for OnUnitEnterVision
     tag_to_unit_[tag] = unit;
-    tag_to_existing_unit_[tag] = unit;
+    tag_to_existing_unit_[tag] = unit; // todo: this duplicates above?? not duplicate. existing are cleared each frame, and repopulated from observation. delete existing alltogether and use game_frame_last observed if needed. remove dead units from tag_to_unit_
     AddNewUnit(unit);
     IncrementIndex();
     return unit;
@@ -55,7 +55,7 @@ void UnitPool::MarkDead(Tag tag) {
         return;
     }
     unit->is_alive = false;
-    // CHeck if this is necessary, bro
+    // CHeck if this is necessary, bro. Not, because it is cleared each frame
     tag_to_existing_unit_.erase(tag);
 }
 

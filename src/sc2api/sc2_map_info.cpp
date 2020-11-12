@@ -27,6 +27,17 @@ SampleImage::SampleImage(const ImageData& data):
     bits_per_pixel_(data.bits_per_pixel) {
 }
 
+bool SampleImage::GetBit(int x, int y, bool* dst) const {
+    assert(bits_per_pixel_ == 1);
+
+    assert(area_.Contain(Point2DI(x,y)));
+
+    div_t idx = div(x + y * area_.Width(), 8);
+    *dst = (data_[idx.quot] >> (7 - idx.rem)) & 1;
+    return true;
+}
+
+
 bool SampleImage::GetBit(const Point2DI& point, bool* dst) const {
     assert(bits_per_pixel_ == 1);
 
@@ -35,6 +46,13 @@ bool SampleImage::GetBit(const Point2DI& point, bool* dst) const {
 
     div_t idx = div(point.x + point.y * area_.Width(), 8);
     *dst = (data_[idx.quot] >> (7 - idx.rem)) & 1;
+    return true;
+}
+
+bool SampleImage::GetBit(int x, int y, unsigned char* dst) const {
+    assert(bits_per_pixel_ > 1);
+    assert(area_.Contain(Point2DI(x, y)));
+    *dst = data_[x + y * area_.Width()];
     return true;
 }
 
@@ -65,14 +83,14 @@ PathingGrid::PathingGrid(const GameInfo& info):
 bool PathingGrid::IsPathable(const Point2DI& point) const {
     if (pathing_grid_.BPP() == 1) {
         bool value;
-        if (!pathing_grid_.GetBit(point, &value))
+        if (!pathing_grid_.GetBit(point.x, point.y, &value))
             return false;
 
         return value;
     }
 
     unsigned char value;
-    if (!pathing_grid_.GetBit(point, &value))
+    if (!pathing_grid_.GetBit(point.x, point.y, &value))
         return false;
 
     return value != 255;
@@ -129,6 +147,14 @@ HeightMap::HeightMap(const GameInfo& info):
 float HeightMap::TerrainHeight(const Point2DI& point) const {
     unsigned char value;
     if (!height_map_.GetBit(point, &value))
+        return 0.0f;
+
+    return (static_cast<float>(value) - 127) / 8.f;
+}
+
+float HeightMap::TerrainHeight(int x, int y) const {
+    unsigned char value;
+    if (!height_map_.GetBit(x,y, &value))
         return 0.0f;
 
     return (static_cast<float>(value) - 127) / 8.f;
