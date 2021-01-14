@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <stdint.h>
+#include <bitset>
 
 namespace sc2 {
 
@@ -16,9 +17,8 @@ typedef MessageResponsePtr<SC2APIProtocol::ResponseData> ResponseDataPtr;
 //! Indicates if an ability is available, and if that ability requires a point.
 struct AvailableAbility {
     AvailableAbility() = default;
-    AvailableAbility(AbilityID ability_id, bool requires_point) :
-        ability_id(ability_id),
-        requires_point(requires_point) {};
+    AvailableAbility(AbilityID ability_id, bool requires_point) : ability_id(ability_id),
+                                                                  requires_point(requires_point){};
 
     //! Ability that is available.
     AbilityID ability_id = 0;
@@ -139,10 +139,10 @@ struct Weapon {
     };
     TargetType type;
     float damage_;
-    std::vector<DamageBonus> damage_bonus;              // Extra damage when attacking a unit of a certain attribute
-    uint32_t attacks;                                   // Number of hits per attack. (eg. Colossus has 2 beams)
+    std::vector<DamageBonus> damage_bonus;  // Extra damage when attacking a unit of a certain attribute
+    uint32_t attacks;                       // Number of hits per attack. (eg. Colossus has 2 beams)
     float range;
-    float speed;                                        // Time between attacks
+    float speed;  // Time between attacks
 
     Weapon();
 
@@ -165,7 +165,7 @@ struct UnitTypeData {
     uint32_t vespene_cost;
 
     //! Unit attributes, may change based on upgrades.
-    std::vector<Attribute> attributes;
+    std::bitset<16> attributes;
     //! Movement speed of unit type.
     float movement_speed;
     //! Armor of unit type.
@@ -267,10 +267,9 @@ typedef std::vector<EffectData> Effects;
 
 //! Power source information for Protoss.
 struct PowerSource {
-    PowerSource(const Point2D in_position, float in_radius, Tag in_tag) :
-        position(in_position),
-        radius(in_radius),
-        tag(in_tag) {};
+    PowerSource(const Point2D in_position, float in_radius, Tag in_tag) : position(in_position),
+                                                                          radius(in_radius),
+                                                                          tag(in_tag){};
 
     //! Power source position.
     Point2D position;
@@ -293,4 +292,4 @@ struct Effect {
 
 AbilityID GetGeneralizedAbilityID(uint32_t ability_id, const ObservationInterface& observation);
 
-}
+}  // namespace sc2

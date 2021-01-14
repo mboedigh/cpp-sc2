@@ -63,16 +63,15 @@ struct PlayerInfo {
     std::string player_name;
 
     PlayerInfo(uint32_t player_id, PlayerType player_type,
-        Race race_requested, Race race_actual,
-        Difficulty difficulty, AIBuild ai_build,
-        const std::string& player_name):
-        player_id(player_id),
-        player_type(player_type),
-        race_requested(race_requested),
-        race_actual(race_actual),
-        difficulty(difficulty),
-        ai_build(ai_build),
-        player_name(player_name) {};
+               Race race_requested, Race race_actual,
+               Difficulty difficulty, AIBuild ai_build,
+               const std::string& player_name) : player_id(player_id),
+                                                 player_type(player_type),
+                                                 race_requested(race_requested),
+                                                 race_actual(race_actual),
+                                                 difficulty(difficulty),
+                                                 ai_build(ai_build),
+                                                 player_name(player_name){};
 };
 
 //! Initial data for a game and map.
@@ -123,7 +122,7 @@ struct SampleImage {
 
     Rect2DI Area() const;
 
-private:
+   private:
     const std::string& data_;
     Rect2DI area_;
 
@@ -136,10 +135,12 @@ struct PathingGrid {
     explicit PathingGrid(const GameInfo& info);
 
     bool IsPathable(const Point2DI& point) const;
+    bool IsPathable(int x, int y) const;
+    Rect2DI Area() const { return pathing_grid_.Area(); }
 
     void Dump(const std::string& file_path) const;
 
-private:
+   private:
     SampleImage pathing_grid_;
 };
 
@@ -150,7 +151,7 @@ struct PlacementGrid {
 
     void Dump(const std::string& file_path) const;
 
-private:
+   private:
     SampleImage placement_grid_;
 };
 
@@ -162,8 +163,8 @@ struct HeightMap {
 
     void Dump(const std::string& file_path) const;
 
-private:
+   private:
     SampleImage height_map_;
 };
 
-}
+}  // namespace sc2

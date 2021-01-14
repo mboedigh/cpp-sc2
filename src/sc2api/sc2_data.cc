@@ -258,8 +258,9 @@ void UnitTypeData::ReadFromProto(const SC2APIProtocol::UnitTypeData& unit_data) 
     vespene_cost = unit_data.vespene_cost();
 
     // attribute_
+    attributes.reset();
     for (int i = 0; i < unit_data.attributes_size(); ++i) {
-        attributes.push_back(ConvertAttributeEnum(unit_data.attributes(i)));
+        attributes.set((int)ConvertAttributeEnum(unit_data.attributes(i)));
     }
 
     // movement_speed_

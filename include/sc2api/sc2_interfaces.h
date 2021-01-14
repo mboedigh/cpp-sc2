@@ -17,7 +17,8 @@ be of little concern to the consumer.
 
 // Forward declarations to avoid including proto headers everywhere.
 namespace SC2APIProtocol {
-    class Observation;
+class Observation;
+class RequestAction;
 }
 
 namespace sc2 {
@@ -45,7 +46,7 @@ typedef std::function<bool(const Unit& unit)> Filter;
 
 //! The ObservationInterface reflects the current state of the game. Guaranteed to be valid when OnGameStart or OnStep is called.
 class ObservationInterface {
-public:
+   public:
     virtual ~ObservationInterface() = default;
 
     //! Gets a unique ID that represents the player.
@@ -222,15 +223,14 @@ public:
     //! Returns terrain height of the given point.
     //!< \param point Position to sample.
     //!< \return Height.
-    virtual float TerrainHeight(const Point2D& point) const = 0; // convenience
-    virtual float TerrainHeight(int x, int y) const = 0; // efficient
+    virtual float TerrainHeight(const Point2D& point) const = 0;  // convenience
+    virtual float TerrainHeight(int x, int y) const = 0;          // efficient
 
     //! A pointer to the low-level protocol data for the current observation. While it's possible to extract most in-game data from this pointer
     // it is highly discouraged. It should only be used for extracting feature layers because it would be inefficient to copy these each frame.
     //!< \return A const pointer to the Observation.
     //!< \sa Observation GetObservation()
     virtual const SC2APIProtocol::Observation* GetRawObservation() const = 0;
-
 };
 
 //! The QueryInterface provides additional data not contained in the observation.
@@ -238,7 +238,7 @@ public:
 //! Performance note:
 //!  - Always try and batch things up. These queries are effectively synchronous and will block until returned.
 class QueryInterface {
-public:
+   public:
     virtual ~QueryInterface() = default;
 
     //! Returns a list of abilities represented as a uint32_t see the ABILITY_ID enum for their corresponding, named, representations.
@@ -286,13 +286,12 @@ public:
 
     struct PlacementQuery {
         PlacementQuery() = default;
-        PlacementQuery(AbilityID ability_id, Point2D target) :
-            ability(ability_id),
-            target_pos(target) {};
+        PlacementQuery(AbilityID ability_id, Point2D target) : ability(ability_id),
+                                                               target_pos(target){};
 
         AbilityID ability;
         Point2D target_pos;
-        Tag placing_unit_tag = 0LL;     // Optional. Used for testing placement with add-ons.
+        Tag placing_unit_tag = 0LL;  // Optional. Used for testing placement with add-ons.
     };
     //! A batch version of the above Placement query. Takes an array of abilities, positions and
     //! optional unit tags and returns a matching array of bools indicating if placement is possible.
@@ -304,16 +303,19 @@ public:
 //! The ActionInterface issues actions to units in a game. Not available in replays.
 //! Guaranteed to be valid when the OnStep event is called.
 class ActionInterface {
-public:
+   public:
     virtual ~ActionInterface() = default;
 
-    /*!\fn virtual void UnitCommand(Tag unit_tag, uint32_t ability)
+    virtual SC2APIProtocol::RequestAction* GetRequestAction() = 0;
+
+        /*!\fn virtual void UnitCommand(Tag unit_tag, uint32_t ability)
      * Batches a UnitCommand that will be dispatched when SendActions() is called. UnitCommand has many overloaded functions, you can call it with
      * most combinations of Unit types (the Unit object or tag), ability types (the enum or uint32_t) and targets (a 2D position or tag).
      * \param unit_tag The unique id that represents the unit.
      * \param ability The unique id that represents the ability, see ABILITY_ID for ids.
      * \sa ABILITY_ID Unit Point2D SendActions()
      */
+
 
     //! Issues a command to a unit. Self targeting.
     //!< \param unit The unit to send the command to.
@@ -370,7 +372,7 @@ public:
 //! The ActionFeatureLayerInterface emulates UI actions in feature layer. Not available in replays.
 //! Guaranteed to be valid when the OnStep event is called.
 class ActionFeatureLayerInterface {
-public:
+   public:
     virtual ~ActionFeatureLayerInterface() = default;
 
     //! Issues a command to whatever is selected. Self targeting.
@@ -404,8 +406,8 @@ public:
 
 //! The ObserverActionInterface corresponds to the actions available in the observer UI.
 class ObserverActionInterface {
-public:
-    virtual ~ObserverActionInterface () = default;
+   public:
+    virtual ~ObserverActionInterface() = default;
 
     //! Moves the observer camera to a target location. Will cause the camera to stop following
     //! the observed player's perspective.
@@ -426,7 +428,7 @@ public:
 //! All debug actions are queued and dispatched when SendDebug is called. All drawn primitives
 //! continue to draw without resending until another SendDebug is called.
 class DebugInterface {
-public:
+   public:
     virtual ~DebugInterface() = default;
 
     // Debug drawing primitives.
@@ -520,15 +522,15 @@ public:
     //!< \param pos The camera position in world space.
     virtual void DebugMoveCamera(const Point2D& pos) = 0;
 
-      enum AppTest {
+    enum AppTest {
         hang = 1,
         crash = 2,
         exit = 3
-      };
+    };
     //! Cause the game to fail; useful to test library behavior.
     //!< \param app_test State to put the game into.
     //!< \param delay_ms Time to elapse before invoking the game state.
-      virtual void DebugTestApp(AppTest app_test, int delay_ms = 0) = 0;
+    virtual void DebugTestApp(AppTest app_test, int delay_ms = 0) = 0;
 
     //! Dispatch all queued debug commands. No debug commands will be sent until this is called.
     //! This will also clear or set new debug primitives like text and lines.

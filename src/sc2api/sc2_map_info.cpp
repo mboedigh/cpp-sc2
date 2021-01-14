@@ -95,6 +95,21 @@ bool PathingGrid::IsPathable(const Point2DI& point) const {
 
     return value != 255;
 }
+bool PathingGrid::IsPathable(int x, int y) const {
+    if (pathing_grid_.BPP() == 1) {
+        bool value;
+        if (!pathing_grid_.GetBit(x, y, &value))
+            return false;
+
+        return value;
+    }
+
+    unsigned char value;
+    if (!pathing_grid_.GetBit(x, y, &value))
+        return false;
+
+    return value != 255;
+}
 
 void PathingGrid::Dump(const std::string& file_path) const {
     std::ofstream dst(file_path);
