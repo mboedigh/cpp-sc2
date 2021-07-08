@@ -159,10 +159,10 @@ bool Convert(const SC2APIProtocol::CloakState& cloak_proto, Unit::CloakState& cl
     return false;
 }
 
-bool Convert(const ObservationRawPtr& observation_raw, UnitPool& unit_pool, uint32_t game_loop, uint32_t prev_game_loop) {
+bool Convert(const ObservationRawPtr& observation_raw, UnitPool& unit_pool, uint32_t game_loop, uint32_t prev_game_loop, UnitTypes const& unit_data) {
     for (int i = 0; i < observation_raw->units_size(); ++i) {
         const SC2APIProtocol::Unit& observation_unit = observation_raw->units(i);
-        Unit* unit = unit_pool.CreateUnit(observation_unit.tag());
+        Unit* unit = unit_pool.CreateUnit(observation_unit, unit_data);
 
         if (!unit) {
             continue;

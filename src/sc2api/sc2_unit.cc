@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <cassert>
-
 #include "s2clientprotocol/sc2api.pb.h"
 
 namespace sc2 {
@@ -10,10 +9,14 @@ namespace sc2 {
 Unit::Unit() {
 }
 
-Unit* UnitPool::CreateUnit(Tag tag) {
+Unit* UnitPool::CreateUnit(const SC2APIProtocol::Unit &aUnit, UnitTypes const& unit_data) {
+    auto tag = aUnit.tag();
     Unit* existing = GetUnit(tag);
     if (existing) {
         tag_to_existing_unit_[tag] = existing;
+        if (existing->unit_type != aUnit.unit_type()) { // morphed
+            existing->unit_data = &unit_data[aUnit.unit_type()];
+        }
         return existing;
     }
 
@@ -24,8 +27,10 @@ Unit* UnitPool::CreateUnit(Tag tag) {
     std::vector<Unit>& pool = unit_pool_[available_index_.first];
     Unit* unit = &pool[available_index_.second];
     unit->last_seen_game_loop = 0; // initialization required for OnUnitEnterVision
+    unit->unit_data = &unit_data[aUnit.unit_type()];
     tag_to_unit_[tag] = unit;
     tag_to_existing_unit_[tag] = unit; // todo: this duplicates above?? not duplicate. existing are cleared each frame, and repopulated from observation. delete existing alltogether and use game_frame_last observed if needed. remove dead units from tag_to_unit_
+
     AddNewUnit(unit);
     IncrementIndex();
     return unit;

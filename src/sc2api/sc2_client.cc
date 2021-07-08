@@ -584,7 +584,7 @@ bool ObservationImp::UpdateObservation() {
     }
     
     unit_pool_.ClearExisting();
-    Convert(observation_raw, unit_pool_, current_game_loop_, previous_game_loop);
+    Convert(observation_raw, unit_pool_, current_game_loop_, previous_game_loop, GetUnitTypeData());
 
     // Remap ability ids in orders.
     unit_pool_.ForEachExistingUnit([&](Unit& unit) {

@@ -208,9 +208,6 @@ static Weapon::TargetType ConvertTargetTypeEnum(SC2APIProtocol::Weapon::TargetTy
     }
 }
 
-Weapon::Weapon() {
-}
-
 void Weapon::ReadFromProto(const SC2APIProtocol::Weapon& weapon) {
     // type_
     type = ConvertTargetTypeEnum(weapon.type());
@@ -269,11 +266,17 @@ void UnitTypeData::ReadFromProto(const SC2APIProtocol::UnitTypeData& unit_data) 
     // armor_
     armor = unit_data.armor();
 
-    // weapons_
     for (int i = 0; i < unit_data.weapons_size(); ++i) {
         Weapon weapon;
         weapon.ReadFromProto(unit_data.weapons(i));
-        weapons.push_back(weapon);
+        if (weapon.type == Weapon::TargetType::Any || weapon.type == Weapon::TargetType::Air)
+            air_weapon = weapon;
+        else
+            air_weapon = Weapon();
+        if (weapon.type == Weapon::TargetType::Any || weapon.type == Weapon::TargetType::Ground)
+            ground_weapon = weapon;
+        else
+            ground_weapon = Weapon();
     }
 
     food_provided = unit_data.food_provided();

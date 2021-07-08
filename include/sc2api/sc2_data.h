@@ -144,7 +144,9 @@ struct Weapon {
     float range;
     float speed;  // Time between attacks
 
-    Weapon();
+    Weapon() {
+        damage_ = 0.0f;
+    }
 
     void ReadFromProto(const SC2APIProtocol::Weapon& weapon);
 };
@@ -171,7 +173,8 @@ struct UnitTypeData {
     //! Armor of unit type.
     float armor;
     //! Weapons on this unit type.
-    std::vector<Weapon> weapons;
+    Weapon air_weapon;
+    Weapon ground_weapon;
     //! How much food the unit requires.
     float food_required;
     //! How much food the unit provides.

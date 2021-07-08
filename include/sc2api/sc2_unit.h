@@ -7,6 +7,7 @@
 #include "sc2_gametypes.h"
 #include "sc2_common.h"
 #include "sc2_typeenums.h"
+#include "sc2_data.h"  // UnitTypes, UnitTypeData
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
@@ -28,10 +29,9 @@ struct UnitOrder {
     //! Progress of the order.
     float progress;
 
-    UnitOrder() :
-        ability_id(0),
-        target_unit_tag(NullTag),
-        progress(0.0f) {
+    UnitOrder() : ability_id(0),
+                  target_unit_tag(NullTag),
+                  progress(0.0f) {
     }
 };
 
@@ -54,21 +54,20 @@ struct PassengerUnit {
     //! The type of unit in the transport.
     UnitTypeID unit_type;
 
-    PassengerUnit() :
-        tag(NullTag),
-        health(0.0f),
-        health_max(0.0f),
-        shield(0.0f),
-        shield_max(0.0f),
-        energy(0.0f),
-        energy_max(0.0f),
-        unit_type(0) {
+    PassengerUnit() : tag(NullTag),
+                      health(0.0f),
+                      health_max(0.0f),
+                      shield(0.0f),
+                      shield_max(0.0f),
+                      energy(0.0f),
+                      energy_max(0.0f),
+                      unit_type(0) {
     }
 };
 
 //! A unit. Could be a structure, a worker or a military unit.
 class Unit {
-public:
+   public:
     //! If the unit is shown on screen or not.
     enum DisplayType {
         //! Unit will be visible.
@@ -115,8 +114,11 @@ public:
 
     //! A unique identifier for the instance of a unit.
     Tag tag;
+
     //! An identifier of the type of unit.
     UnitTypeID unit_type;
+    UnitTypeData const* unit_data;
+
     //! Which player owns a unit.
     int owner;
 
@@ -209,6 +211,7 @@ public:
     Unit();
 };
 
+typedef Unit const* UnitPtr;
 typedef std::vector<const Unit*> Units;
 typedef std::unordered_map<Tag, size_t> UnitIdxMap;
 
@@ -221,8 +224,8 @@ struct UnitDamage {
 typedef std::vector<UnitDamage> UnitsDamaged;
 
 class UnitPool {
-public:
-    Unit* CreateUnit(Tag tag);
+   public:
+    Unit* CreateUnit(const SC2APIProtocol::Unit& aUnit, UnitTypes const& unit_data);
     Unit* GetUnit(Tag tag) const;
     Unit* GetExistingUnit(Tag tag) const;
     void MarkDead(Tag tag);
@@ -246,7 +249,7 @@ public:
     }
     void AddUnitDamaged(const Unit* u, float health, float shield) { units_damaged_.push_back({u, health, shield}); }
 
-private:
+   private:
     void IncrementIndex();
 
     static const size_t ENTRY_SIZE = 1000;
@@ -254,8 +257,8 @@ private:
     // std::array<Unit, ENTRY_SIZE>
     std::vector<std::vector<Unit> > unit_pool_;
     PoolIndex available_index_;
-    std::unordered_map<Tag, Unit *> tag_to_unit_;
-    std::unordered_map<Tag, Unit *> tag_to_existing_unit_;
+    std::unordered_map<Tag, Unit*> tag_to_unit_;
+    std::unordered_map<Tag, Unit*> tag_to_existing_unit_;
     Units units_newly_created_;
     Units units_entering_vision_;
     Units buildings_constructed_;
@@ -263,4 +266,4 @@ private:
     std::unordered_set<const Unit*> units_idled_;
 };
 
-}
+}  // namespace sc2

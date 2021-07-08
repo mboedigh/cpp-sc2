@@ -560,7 +560,7 @@ bool CoordinatorImp::CreateGame() {
     // Create the game with the first client.
     Agent* firstClient = agents_.front();
     return firstClient->Control()->CreateGame(game_settings_.map_name, game_settings_.player_setup, process_settings_.realtime);
-}
+ }
 
 bool CoordinatorImp::JoinGame() {
     int i = 0;
